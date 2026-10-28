@@ -1,0 +1,15 @@
+.venv/
+.venv-*/
+venv/
+__pycache__/
+*.py[cod]
+
+archive.zip
+archive/Dataset/
+data/Dataset/
+training_data/
+
+outputs/*
+!outputs/.gitkeep
+model/disease_model.keras
+model/labels.json

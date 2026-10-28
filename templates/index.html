@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LeafVision | Plant Leaf Disease Detection</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<header class="topbar">
+  <a class="brand" href="#top">
+    <span class="logo">🌿</span>
+    <span class="brand-text"><b>LeafVision</b><small>Plant Leaf Disease Detection</small></span>
+  </a>
+  <nav class="topnav"><a href="#train">Train Model</a><a href="#about">About</a></nav>
+  <span class="tag">Digital Image Processing Mini Project</span>
+</header>
+
+<main id="top">
+
+  <!-- ===================== LANDING ===================== -->
+  <section class="hero">
+    <div class="hero-text">
+      <span class="eyebrow">Digital Image Processing Based Analysis</span>
+      <h1>Plant Leaf <em>Disease Detection</em></h1>
+      <p class="subtitle">Digital Image Processing Based Analysis</p>
+      <p class="lead">A hybrid DIP and deep-learning project: image enhancement and filtering prepare the leaf image, MobileNetV2 predicts its class, and separate colour segmentation estimates candidate regions. The dashboard distinguishes methods used by the classifier from mask processing and visual demonstrations.</p>
+      <ol class="mini-flow">
+        <li>Acquisition</li><li>Enhancement</li><li>Filtering</li><li>Edge Detection</li>
+        <li>Thresholding</li><li>Morphology</li><li>Disease Detection</li><li>Final Result</li>
+      </ol>
+    </div>
+
+    <div class="upload-card">
+      <div id="drop" class="drop" tabindex="0">
+        <div class="drop-icon">🍃</div>
+        <h3>Drop a leaf image here</h3>
+        <p class="muted">Supported formats: JPG, JPEG, PNG</p>
+        <input id="file" type="file" accept=".jpg,.jpeg,.png,image/jpeg,image/png" hidden>
+        <button id="pick" class="btn primary" type="button">Upload Leaf Image</button>
+        <div id="preview" class="preview hidden"><img id="previewImg" alt="Selected leaf preview"><span id="previewName"></span></div>
+        <button id="go" class="btn accent hidden" type="button">Analyze Leaf</button>
+      </div>
+      <div id="modelBanner" class="banner hidden"></div>
+      <div id="errorBox" class="banner error hidden" role="alert"></div>
+    </div>
+  </section>
+
+
+  <!-- ===================== TRAIN MODEL ===================== -->
+  <section class="panel" id="train">
+    <div class="section-head">
+      <span class="eyebrow">Model Management</span>
+      <h2>Train the Disease Classifier</h2>
+      <button id="trainToggle" class="btn outline hidden" type="button" aria-expanded="false" aria-controls="trainContent">Manage training / Retrain</button>
+    </div>
+    <div id="trainContent">
+      <p class="muted">Upload labelled leaf images (one class per disease, plus a Healthy class), then press <b>Train Model</b>. Training runs on this computer and can take several minutes.</p>
+      <div class="train-grid">
+        <div class="train-col">
+        <h4>1. Add images</h4>
+        <div class="train-box">
+          <b>Option A &ndash; whole dataset folder</b>
+          <p class="muted small">Pick a folder that contains one sub-folder per class (e.g. Healthy, Grape_Black_Rot). Folder names become the class names.</p>
+          <input id="folderInput" type="file" webkitdirectory directory multiple hidden>
+          <button id="folderBtn" class="btn outline" type="button">Select Dataset Folder</button>
+        </div>
+        <div class="train-box">
+          <b>Option B &ndash; images for one class</b>
+          <p class="muted small">Type the class name, then choose its images (JPG / PNG).</p>
+          <input id="className" class="text-input" type="text" maxlength="60" placeholder="e.g. Grape Black Rot or Healthy" list="classHints">
+          <datalist id="classHints"></datalist>
+          <input id="classFiles" type="file" accept=".jpg,.jpeg,.png,image/jpeg,image/png" multiple hidden>
+          <button id="classBtn" class="btn outline" type="button">Choose Images &amp; Add</button>
+        </div>
+        <div id="uploadStatus" class="small muted"></div>
+        <div id="trainError" class="banner error hidden" role="alert"></div>
+        </div>
+        <div class="train-col">
+        <h4>2. Your dataset</h4>
+        <div id="datasetList" class="dataset-list"><p class="muted small">No images uploaded yet.</p></div>
+        <div class="train-actions">
+          <label class="small">Epochs <input id="epochs" class="text-input num" type="number" min="1" max="30" value="8"></label>
+          <button id="trainBtn" class="btn accent" type="button">Train Model</button>
+        </div>
+        <div id="trainProgress" class="hidden">
+          <div class="meter big"><span id="trainBar" style="width:0%"></span></div>
+          <div id="trainText" class="small"></div>
+        </div>
+        <div id="trainMsg" class="banner hidden"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div id="loading" class="loading hidden"><div class="spinner"></div><p>Running the DIP pipeline&hellip;</p></div>
+
+  <!-- ===================== RESULTS ===================== -->
+  <div id="results" class="hidden">
+
+    <!-- Processing dashboard -->
+    <section class="panel" id="dashboard">
+      <div class="section-head"><span class="eyebrow">Processing Dashboard</span><h2>DIP Pipeline Stages</h2>
+        <p class="muted">Click any stage to inspect its output. Labels show whether each concept feeds the classifier, supports the visual mask, or is demonstrated only.</p></div>
+      <div id="timeline" class="timeline" role="tablist"></div>
+      <div class="stage-legend" aria-label="Pipeline stage label legend">
+        <span class="stage-tag used">Classifier input</span>
+        <span class="stage-tag mask">Mask processing / demo</span>
+        <span class="stage-tag demo">Demonstration only</span>
+        <span class="stage-tag ml">Machine learning</span>
+        <span class="stage-tag output">Input / output</span>
+      </div>
+      <div id="stageView" class="stage-view"></div>
+    </section>
+
+    <!-- Disease detection result -->
+    <section class="panel" id="resultSection">
+      <div class="section-head"><span class="eyebrow">Stage 7 &amp; 8 &middot; Disease Detection &rarr; Final Result</span>
+        <h2>Disease Detection Result</h2></div>
+      <div id="resultCard" class="result-card"></div>
+    </section>
+
+    <!-- Disease information -->
+    <section class="panel" id="infoSection">
+      <div class="section-head"><span class="eyebrow">Knowledge</span><h2>Disease Information</h2></div>
+      <div id="infoCard"></div>
+    </section>
+
+    <!-- Comparison -->
+    <section class="panel" id="compareSection">
+      <div class="section-head"><span class="eyebrow">Compare</span><h2>Processing Comparison</h2>
+        <p class="muted">Original &middot; Enhanced &middot; Filtered &middot; Segmented &middot; Morphology &middot; Final Result</p></div>
+      <div id="compareCards" class="compare-cards"></div>
+      <div class="slider-box">
+        <div class="slider-controls">
+          <label>Before / after slider &mdash; compare Original with
+            <select id="compareSelect"></select></label>
+        </div>
+        <div class="ba" id="ba">
+          <img id="baAfter" alt="After">
+          <div class="ba-before" id="baBefore"><img id="baBeforeImg" alt="Original"></div>
+          <div class="ba-line" id="baLine"></div>
+        </div>
+        <input id="baRange" type="range" min="0" max="100" value="50" aria-label="Comparison slider">
+      </div>
+    </section>
+  </div>
+
+  <!-- ===================== ABOUT ===================== -->
+  <section class="panel about" id="about">
+    <div class="section-head"><span class="eyebrow">About Project</span><h2>About Project</h2></div>
+    <div class="about-grid">
+      <div class="about-card"><h4>Project</h4><p>Plant Leaf Disease Detection</p></div>
+      <div class="about-card"><h4>Team Members</h4><p>Samiksha Chavan<br>Jagruti Thotam</p></div>
+      <div class="about-card"><h4>Technology</h4>
+        <div class="chips"><span>Python</span><span>OpenCV</span><span>NumPy</span><span>Matplotlib</span><span>TensorFlow/Keras</span><span>Flask</span><span>HTML</span><span>CSS</span><span>JavaScript</span></div></div>
+      <div class="about-card"><h4>DIP Concepts</h4>
+        <div class="chips"><span>Contrast Stretching</span><span>Gaussian Filtering</span><span>HSV Colour Space</span><span>Otsu Thresholding</span><span>Adaptive Thresholding</span><span>Colour Segmentation</span><span>Contour Analysis</span><span>Morphology</span><span>Connected Components</span><span>Edge Detection Demonstrations</span></div></div>
+    </div>
+  </section>
+
+  <section class="panel model-details" id="model-details">
+    <div class="section-head"><span class="eyebrow">Project Summary</span><h2>Model, Accuracy &amp; DIP Concepts</h2>
+      <p class="muted">What the model predicts and how the eight dashboard stages are used.</p></div>
+    <div class="summary-grid">
+      <article class="summary-card">
+        <h3>Classifier model</h3>
+        <p>A MobileNetV2 convolutional neural network uses transfer learning and a 23-class softmax output to classify supported plant leaf images.</p>
+        <p><b>Classes available:</b> <span id="modelClassCount">Loading model status…</span></p>
+        <p><b>Image sent to the classifier:</b> contrast stretching, 3 &times; 3 Gaussian blur, resize to 224 &times; 224, then BGR-to-RGB conversion.</p>
+      </article>
+      <article class="summary-card">
+        <h3>Validation accuracy</h3>
+        <p class="accuracy-value" id="modelAccuracy">Loading model status…</p>
+        <p id="validationContext" class="muted">The saved validation score is not a guarantee of accuracy on a new photo.</p>
+        <p>The prediction confidence shown for an uploaded image is different from validation accuracy. An independent test set is needed to measure real-world performance.</p>
+      </article>
+    </div>
+    <div class="summary-card dip-summary">
+      <h3>Which DIP concepts are used?</h3>
+      <p><b>Classifier preprocessing:</b> contrast stretching and Gaussian filtering are used before MobileNetV2.</p>
+      <p><b>Separate visual overlay (DIP segmentation):</b> HSV colour-space conversion, Otsu thresholding on saturation, and largest-contour selection estimate a leaf mask. HSV colour rules and local adaptive Gaussian thresholding on brightness find candidate pixels; erosion, opening/closing, and connected-component area filtering clean the mask. This active DIP path creates an approximate visual aid and does not decide the disease class.</p>
+      <p><b>Dashboard demonstrations:</b> negative/gamma transforms, median/Laplacian/high-boost filters, Roberts/Prewitt/Sobel edges, and global/Otsu/adaptive threshold outputs illustrate DIP methods; they are not classifier inputs.</p>
+      <p class="summary-caveat" id="validationCaveat">The included model’s reported validation score may be optimistic because it predates grouped validation splitting and related transformed images may have appeared in both splits. Verify results with an agricultural expert.</p>
+    </div>
+  </section>
+</main>
+
+<footer>LeafVision &middot; Plant Leaf Disease Detection &middot; Samiksha Chavan &amp; Jagruti Thotam<br>
+  <small>Academic project &mdash; results must be verified by an agricultural expert before any treatment.</small></footer>
+
+<script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>
