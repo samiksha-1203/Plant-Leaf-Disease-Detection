@@ -13,3 +13,5 @@ outputs/*
 !outputs/.gitkeep
 model/disease_model.keras
 model/labels.json
+!model/disease_model.keras
+!model/labels.json
