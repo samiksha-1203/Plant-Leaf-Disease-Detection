@@ -113,7 +113,7 @@ DIP operators; the disease prediction comes from a trained CNN classifier.**
 | 2. Enhancement | Contrast stretching (min-max normalization); negative and gamma correction are also displayed | Contrast stretching is used for model input. Negative and gamma images are demonstrations only. |
 | 3. Filtering | Gaussian and median smoothing; Laplacian and high-boost examples | A small Gaussian blur is used for model input. Other filter outputs are demonstrations only. |
 | 4. Edge Detection | Roberts, Prewitt, Sobel, and Laplacian operators | Visual demonstrations only; edge maps are not sent to the classifier. |
-| 5. Thresholding | Fixed/global, Otsu, and adaptive thresholding | Dashboard grayscale examples are demonstrations. The active mask path uses Otsu thresholding on HSV saturation to estimate the leaf mask and local adaptive Gaussian thresholding on brightness to identify relatively dark candidate patches. |
+| 5. Thresholding | Fixed/global, Otsu, and adaptive thresholding | Dashboard grayscale examples are demonstrations. A separate Otsu threshold on HSV saturation is used to estimate the leaf mask. |
 | 6. Morphology | Erosion, dilation, opening, and closing on a threshold image | Dashboard examples are demonstrations. Closing/opening and erosion are also used in the separate approximate leaf/colour mask for the overlay. |
 | 7. Disease Detection | MobileNetV2-based image classifier | Predicts one of the model's 23 trained classes from the preprocessed colour image. This is machine learning, not an edge or thresholding algorithm. |
 | 8. Final Result | Prediction, confidence, and annotated image | Displays the classifier output. The optional red overlay is a heuristic colour-based estimate, not a classifier-confirmed lesion. |
@@ -132,13 +132,14 @@ The training and prediction code share this preprocessing so that the model
 receives images in the same format in both cases. Edge maps and the dashboard's
 grayscale threshold outputs are not classifier inputs. Leaf segmentation and
 candidate-region detection run separately to produce the optional overlay:
-HSV saturation and Otsu thresholding estimate the leaf, then local adaptive
-Gaussian thresholding on the HSV brightness channel detects dark areas
-relative to nearby pixels. Colour rules, morphology, and connected-component
-area filtering further refine the mask. This active DIP segmentation does not
-change the predicted class or require retraining the classifier. Its overlay
-is approximate and can flag shadows or natural colour variation; it is not a
-confirmed lesion detector.
+HSV saturation and Otsu thresholding estimate the leaf; HSV colour and
+brightness rules flag candidate pixels, while morphology and
+connected-component area filtering refine the mask. The adaptive-threshold
+dashboard output is a demonstration and is not included in lesion marking,
+because local thresholding overmarked image texture in testing. This separate
+DIP segmentation does not change the predicted class or require retraining the
+classifier. Its overlay is approximate and can flag shadows or natural colour
+variation; it is not a confirmed lesion detector.
 
 ## Model and accuracy
 

@@ -111,8 +111,8 @@ def segment_leaf(img):
 
 def find_lesions(img, leaf_mask):
     """
-    Locate suspicious colour and locally dark pixels inside the leaf.
-    Adaptive thresholding and morphology refine this approximate DIP mask.
+    Locate suspicious non-green, very dark, or whitish pixels inside the leaf.
+    Colour rules and morphology produce an approximate DIP mask.
     Returns (lesion_mask uint8 0/255, leaf_pixel_count, lesion_pixel_count).
     """
     hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
@@ -130,12 +130,8 @@ def find_lesions(img, leaf_mask):
     median_v = float(np.median(v[inside]))
     not_green = ((h < 33) | (h > 90)) & (s > 40)     # brown / yellow / purple
     dark = v < 0.45 * median_v                       # necrotic / black spots
-    block_size = max(3, min(51, (side // 20) | 1))
-    local_dark = cv2.adaptiveThreshold(
-        v, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, block_size, 5
-    ) > 0
     whitish = (s < 40) & (v > 190)                   # powdery coating
-    lesion = ((not_green | dark | local_dark | whitish) & inside).astype(np.uint8) * 255
+    lesion = ((not_green | dark | whitish) & inside).astype(np.uint8) * 255
 
     k3 = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3))
     k5 = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))

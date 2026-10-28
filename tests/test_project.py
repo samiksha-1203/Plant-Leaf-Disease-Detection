@@ -113,7 +113,7 @@ class ImagePipelineTests(unittest.TestCase):
         self.assertFalse(found)
         self.assertEqual(int(np.count_nonzero(mask)), 0)
 
-    def test_local_adaptive_threshold_finds_moderately_dark_leaf_patch(self):
+    def test_moderately_dark_green_patch_is_not_overmarked(self):
         hsv = np.full((200, 200, 3), (60, 180, 200), dtype=np.uint8)
         hsv[80:120, 80:120, 2] = 150
         image = cv2.cvtColor(hsv, cv2.COLOR_HSV2BGR)
@@ -122,8 +122,8 @@ class ImagePipelineTests(unittest.TestCase):
 
         lesion_mask, _, lesion_pixels = dip_pipeline.find_lesions(image, leaf_mask)
 
-        self.assertGreater(lesion_pixels, 0)
-        self.assertGreater(int(np.count_nonzero(lesion_mask[80:120, 80:120])), 0)
+        self.assertEqual(lesion_pixels, 0)
+        self.assertEqual(int(np.count_nonzero(lesion_mask)), 0)
 
 
 if __name__ == "__main__":

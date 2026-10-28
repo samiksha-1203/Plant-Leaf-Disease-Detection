@@ -156,7 +156,7 @@
       <div class="about-card"><h4>Technology</h4>
         <div class="chips"><span>Python</span><span>OpenCV</span><span>NumPy</span><span>Matplotlib</span><span>TensorFlow/Keras</span><span>Flask</span><span>HTML</span><span>CSS</span><span>JavaScript</span></div></div>
       <div class="about-card"><h4>DIP Concepts</h4>
-        <div class="chips"><span>Contrast Stretching</span><span>Gaussian Filtering</span><span>HSV Colour Space</span><span>Otsu Thresholding</span><span>Adaptive Thresholding</span><span>Colour Segmentation</span><span>Contour Analysis</span><span>Morphology</span><span>Connected Components</span><span>Edge Detection Demonstrations</span></div></div>
+        <div class="chips"><span>Contrast Stretching</span><span>Gaussian Filtering</span><span>HSV Colour Space</span><span>Otsu Thresholding</span><span>Colour Segmentation</span><span>Contour Analysis</span><span>Morphology</span><span>Connected Components</span><span>Adaptive Thresholding Demonstration</span><span>Edge Detection Demonstrations</span></div></div>
     </div>
   </section>
 
@@ -180,7 +180,7 @@
     <div class="summary-card dip-summary">
       <h3>Which DIP concepts are used?</h3>
       <p><b>Classifier preprocessing:</b> contrast stretching and Gaussian filtering are used before MobileNetV2.</p>
-      <p><b>Separate visual overlay (DIP segmentation):</b> HSV colour-space conversion, Otsu thresholding on saturation, and largest-contour selection estimate a leaf mask. HSV colour rules and local adaptive Gaussian thresholding on brightness find candidate pixels; erosion, opening/closing, and connected-component area filtering clean the mask. This active DIP path creates an approximate visual aid and does not decide the disease class.</p>
+      <p><b>Separate visual overlay (DIP segmentation):</b> HSV colour-space conversion, Otsu thresholding on saturation, and largest-contour selection estimate a leaf mask. HSV colour and brightness rules find candidate pixels; erosion, opening/closing, and connected-component area filtering clean the mask. This active DIP path creates an approximate visual aid and does not decide the disease class.</p>
       <p><b>Dashboard demonstrations:</b> negative/gamma transforms, median/Laplacian/high-boost filters, Roberts/Prewitt/Sobel edges, and global/Otsu/adaptive threshold outputs illustrate DIP methods; they are not classifier inputs.</p>
       <p class="summary-caveat" id="validationCaveat">The included model’s reported validation score may be optimistic because it predates grouped validation splitting and related transformed images may have appeared in both splits. Verify results with an agricultural expert.</p>
     </div>
