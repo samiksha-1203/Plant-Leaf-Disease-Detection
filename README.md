@@ -182,9 +182,11 @@ does not replace diagnosis by an agricultural expert.
 
 Plant diseases can reduce crop health and yield, and checking leaf images is a
 clear, visual way to explore digital image processing and machine learning.
-This project combines image enhancement, filtering, edge detection,
-thresholding, morphology, and image classification in one demonstrable
-workflow.
+This hybrid project uses image enhancement and filtering before
+MobileNetV2 classification, and uses thresholding, colour analysis, and
+morphology in a separate approximate leaf/region segmentation path. Other
+operators, including edge detectors, are available in the dashboard as
+educational demonstrations rather than classifier inputs.
 
 ### 3. What dataset did you use?
 
@@ -207,22 +209,27 @@ controlled experiment proving it is optimal.
 
 ### 5. How does your segmentation method work?
 
-The app estimates the leaf foreground using HSV saturation and Otsu
-thresholding, followed by morphological closing and opening. It keeps the
-largest sufficiently sized contour and rejects masks that cover too little
-or too much of the image. Within an accepted leaf mask, simple HSV colour and
-brightness rules flag non-green, very dark, or pale pixels as candidate
-regions; morphology and connected-component size filtering clean up the
-estimate. This is a heuristic visual aid, not a trained segmentation model
-and not proof that marked pixels are diseased tissue.
+The app estimates the leaf foreground by converting the image to HSV and
+applying Otsu thresholding to saturation. It then uses morphological closing
+and opening, selects the largest sufficiently sized contour, and rejects
+masks that cover too little or too much of the image. Inside an accepted leaf
+mask, HSV colour and brightness rules flag non-green or pale pixels, while
+local adaptive Gaussian thresholding on brightness detects relatively dark
+patches compared with their local surroundings. Morphological cleanup and
+connected-component area filtering remove small specks. This is a heuristic
+visual aid, not a trained segmentation model or proof that marked tissue is
+diseased.
 
 ### 6. Why did you use erosion/dilation or other morphological operations?
 
-Morphological operations use a small structuring element to refine binary
-masks. Closing can fill small gaps, opening can remove small foreground
-specks, and erosion/dilation shrink or expand a mask. In this project they
-help clean threshold-derived leaf and colour candidate masks and demonstrate
-standard DIP concepts. They do not determine the classifier's disease label.
+Morphological operations use a structuring element to refine binary masks.
+Closing can fill small gaps, opening can remove small foreground specks, and
+erosion shrinks the leaf mask slightly to avoid including its boundary when
+searching for candidate regions. These operations help clean the separate
+leaf and colour candidate masks. Erosion, dilation, opening, and closing are
+also displayed on a threshold image in the dashboard to illustrate their
+effects; the displayed dilation is not part of the active disease-classifier
+path. None of these operations determines the classifier's disease label.
 
 ### 7. Which method produced the best results and why?
 
